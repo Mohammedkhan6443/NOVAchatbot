@@ -94,7 +94,7 @@
   <div class="chat-header">Nova - Virtual Assistant</div>
   <div class="chat-messages" id="chat-messages"></div>
   <div class="chat-input">
-    <input type="text" id="user-input" placeholder="Type your message..." />
+    <input type="text" id="user-input" placeholder="Type your message..." onkeydown="if(event.key === 'Enter') sendUserMessage()" />
     <button onclick="sendUserMessage()">Send</button>
   </div>
 </div>
@@ -126,14 +126,16 @@
   function handleBotLogic(msg) {
     const lower = msg.toLowerCase();
 
-    if (!userName && isLikelyName(msg)) {
-      userName = capitalize(msg);
+    if (!userName && extractName(msg)) {
+      userName = capitalize(extractName(msg));
       showBotMessage(`Nice to meet you, ${userName}! How can I assist you today?`);
       return;
     }
 
     if (lower.includes("order")) {
       showBotMessage(`You can check your order status by logging into your account, ${userName || "there"}.`);
+    } else if (lower.includes("return")) {
+      showBotMessage("You can return your product within 30 days. Please visit our Returns & Refunds page for more info.");
     } else if (lower.includes("agent") || lower.includes("representative") || lower.includes("human")) {
       showBotMessage("Okay! Let me connect you with a representative. Please wait while I transfer you… ⏳");
       setTimeout(() => {
@@ -142,9 +144,16 @@
     } else if (lower.includes("thank") || lower.includes("bye")) {
       showBotMessage("Was I helpful today? 😊 Please rate our chat!");
       showCSAT();
+    } else if (lower.includes("more") || lower.includes("another") || lower.includes("question")) {
+      showBotMessage("Sure! Go ahead, I’m here to help you with anything else you need.");
     } else {
       showBotMessage("I'm here to help! Can you say that again?");
     }
+  }
+
+  function extractName(text) {
+    const match = text.match(/(?:my name is|i am|this is) ([a-zA-Z]{2,}(?: [a-zA-Z]{2,})?)/i);
+    return match ? match[1] : /^[a-zA-Z]{2,}(?: [a-zA-Z]{2,})?$/.test(text.trim()) ? text.trim() : null;
   }
 
   function showBotMessage(text) {
@@ -157,10 +166,6 @@
     div.textContent = text;
     chatMessages.appendChild(div);
     chatMessages.scrollTop = chatMessages.scrollHeight;
-  }
-
-  function isLikelyName(input) {
-    return /^[a-zA-Z]{2,}( [a-zA-Z]{2,})?$/.test(input.trim());
   }
 
   function capitalize(str) {
