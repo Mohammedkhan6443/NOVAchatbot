@@ -132,14 +132,14 @@
       return;
     }
 
-    if (["where is my order", "track my order"].includes(lower)) {
+    if (lower.includes("order")) {
       showBotMessage(`You can check your order status by logging into your account, ${userName || "there"}.`);
-    } else if (["talk to agent", "representative", "human"].includes(lower)) {
+    } else if (lower.includes("agent") || lower.includes("representative") || lower.includes("human")) {
       showBotMessage("Okay! Let me connect you with a representative. Please wait while I transfer you… ⏳");
       setTimeout(() => {
         showBotMessage("Just kidding 😄 I'm still learning! But feel free to leave your question, and a human can follow up later.");
       }, 2000);
-    } else if (["thanks", "thank you", "bye"].includes(lower)) {
+    } else if (lower.includes("thank") || lower.includes("bye")) {
       showBotMessage("Was I helpful today? 😊 Please rate our chat!");
       showCSAT();
     } else {
