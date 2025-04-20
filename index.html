@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Nova - Virtual Assistant</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+    #nova-chat-button {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background-color: #007bff;
+      color: white;
+      border: none;
+      padding: 12px 16px;
+      border-radius: 30px;
+      cursor: pointer;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      z-index: 1000;
+    }
+    .chat-popup {
+      display: none;
+      position: fixed;
+      bottom: 80px;
+      right: 20px;
+      width: 320px;
+      background: white;
+      border-radius: 10px;
+      border: 1px solid #ccc;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 1001;
+      flex-direction: column;
+    }
+    .chat-header {
+      background-color: #007bff;
+      color: white;
+      padding: 10px;
+      font-weight: bold;
+      border-top-left-radius: 10px;
+      border-top-right-radius: 10px;
+    }
+    .chat-messages {
+      padding: 10px;
+      height: 300px;
+      overflow-y: auto;
+    }
+    .chat-input {
+      display: flex;
+      border-top: 1px solid #ccc;
+    }
+    .chat-input input {
+      flex: 1;
+      padding: 10px;
+      border: none;
+    }
+    .chat-input button {
+      padding: 10px;
+      background: #007bff;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .bot-msg {
+      background-color: #e9f5ff;
+      padding: 8px 12px;
+      margin: 6px 0;
+      border-radius: 10px;
+      max-width: 80%;
+    }
+    .user-msg {
+      background-color: #007bff;
+      color: white;
+      padding: 8px 12px;
+      margin: 6px 0;
+      border-radius: 10px;
+      max-width: 80%;
+      align-self: flex-end;
+    }
+    .emoji-feedback span {
+      font-size: 24px;
+      margin: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<button id="nova-chat-button">💬 Chat with Nova</button>
+
+<div class="chat-popup" id="chat-box">
+  <div class="chat-header">Nova - Virtual Assistant</div>
+  <div class="chat-messages" id="chat-messages"></div>
+  <div class="chat-input">
+    <input type="text" id="user-input" placeholder="Type your message..." />
+    <button onclick="sendUserMessage()">Send</button>
+  </div>
+</div>
+
+<script>
+  const chatBtn = document.getElementById("nova-chat-button");
+  const chatBox = document.getElementById("chat-box");
+  const chatMessages = document.getElementById("chat-messages");
+  let userName = "";
+
+  chatBtn.onclick = () => {
+    chatBox.style.display = chatBox.style.display === "flex" ? "none" : "flex";
+    if (chatMessages.innerHTML === "") {
+      showBotMessage("🤖 Hi! I'm Nova 😊 What's your name?");
+    }
+  };
+
+  function sendUserMessage() {
+    const input = document.getElementById("user-input");
+    const msg = input.value.trim();
+    if (!msg) return;
+
+    addMessage(msg, "user-msg");
+    input.value = "";
+
+    setTimeout(() => handleBotLogic(msg), 500);
+  }
+
+  function handleBotLogic(msg) {
+    const lower = msg.toLowerCase();
+
+    if (!userName && isLikelyName(msg)) {
+      userName = capitalize(msg);
+      showBotMessage(`Nice to meet you, ${userName}! How can I assist you today?`);
+      return;
+    }
+
+    if (["where is my order", "track my order"].includes(lower)) {
+      showBotMessage(`You can check your order status by logging into your account, ${userName || "there"}.`);
+    } else if (["talk to agent", "representative", "human"].includes(lower)) {
+      showBotMessage("Okay! Let me connect you with a representative. Please wait while I transfer you… ⏳");
+      setTimeout(() => {
+        showBotMessage("Just kidding 😄 I'm still learning! But feel free to leave your question, and a human can follow up later.");
+      }, 2000);
+    } else if (["thanks", "thank you", "bye"].includes(lower)) {
+      showBotMessage("Was I helpful today? 😊 Please rate our chat!");
+      showCSAT();
+    } else {
+      showBotMessage("I'm here to help! Can you say that again?");
+    }
+  }
+
+  function showBotMessage(text) {
+    addMessage(text, "bot-msg");
+  }
+
+  function addMessage(text, className) {
+    const div = document.createElement("div");
+    div.className = className;
+    div.textContent = text;
+    chatMessages.appendChild(div);
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  }
+
+  function isLikelyName(input) {
+    return /^[a-zA-Z]{2,}( [a-zA-Z]{2,})?$/.test(input.trim());
+  }
+
+  function capitalize(str) {
+    return str
+      .split(" ")
+      .map(word => word[0].toUpperCase() + word.slice(1).toLowerCase())
+      .join(" ");
+  }
+
+  function showCSAT() {
+    const row = document.createElement("div");
+    row.className = "emoji-feedback bot-msg";
+    row.innerHTML = `
+      <span onclick="csatResponse('🙁')">🙁</span>
+      <span onclick="csatResponse('😐')">😐</span>
+      <span onclick="csatResponse('🙂')">🙂</span>
+      <span onclick="csatResponse('😄')">😄</span>
+      <span onclick="csatResponse('😍')">😍</span>
+    `;
+    chatMessages.appendChild(row);
+  }
+
+  function csatResponse(emoji) {
+    showBotMessage(`Thanks for your feedback! ${emoji} I'm always improving 💪`);
+  }
+</script>
+
+</body>
+</html>
