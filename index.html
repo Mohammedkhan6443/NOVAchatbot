@@ -84,7 +84,7 @@ function handleBotLogic(msg) {
     }, 2000);
   } else if (lower.includes("thank") || lower.includes("bye")) {
     showBotMessage("Thanks for chatting with Nova! 👋 Feel free to reach us again anytime!");
-    setTimeout(() => closeChatNow(), 5000);
+    setTimeout(() => showCSAT(), 1000);
   } else {
     showBotMessage("I'm here to help! Could you please rephrase your request?");
   }
